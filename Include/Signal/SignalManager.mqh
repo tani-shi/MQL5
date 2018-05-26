@@ -63,16 +63,22 @@ void SignalManager::Update(const MqlRates& rt) {
 }
 
 void SignalManager::Enable(ENUM_SIGNAL signal) {
-  if (_signals[(int)signal] != NULL && !_signals[(int)signal].Initialize()) {
+  if (_signals[(int)signal] == NULL || !_signals[(int)signal].Enable()) {
     Print("failed to initialize a signal of id=", (int)signal, ".");
   }
 }
 
 ENUM_ORDER_TYPE SignalManager::Signal() const {
-  ENUM_ORDER_TYPE signal = _signals[0].signal();
-  for (int i = 1; i < ENUM_SIGNAL_SIZE; i++) {
-    if ((*_signals[i]).signal() != signal) {
-      return WRONG_VALUE;
+  ENUM_ORDER_TYPE signal = WRONG_VALUE;
+  for (int i = 0; i < ENUM_SIGNAL_SIZE; i++) {
+    if (_signals[i] != NULL && (*_signals[i]).enabled()) {
+      if (signal == WRONG_VALUE) {
+        signal = (*_signals[i]).signal();
+        continue;
+      }
+      if ((*_signals[i]).signal() != signal) {
+        return WRONG_VALUE;
+      }
     }
   }
   return signal;

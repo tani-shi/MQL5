@@ -15,10 +15,14 @@ public:
   SignalSAR(const string symbol)
   : SignalBase(symbol)
   , _handle(INVALID_HANDLE)
-  , _prev_trend(TREND_NONE) {}
+  , _prev_trend(TREND_NONE) {
+    _isUpdateWhenOnlyFirstTickVolume = true;
+  }
   
-  virtual bool Initialize() override;
   virtual bool Update(const MqlRates& rt) override;
+  
+protected:
+  virtual bool Initialize() override;
 
 private:
   ENUM_TREND Trend(double sar, double open) const;

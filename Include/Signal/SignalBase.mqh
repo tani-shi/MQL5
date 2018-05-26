@@ -20,10 +20,9 @@ public:
   , _enabled(false)
   , _isUpdateWhenOnlyFirstTickVolume(false) {}
 
-  virtual bool Initialize();
   virtual bool Update(const MqlRates& rt);
   
-  void Enable();
+  bool Enable();
   
   ENUM_ORDER_TYPE signal() const {
     return _signal;
@@ -33,6 +32,8 @@ public:
   }
 
 protected:
+  virtual bool Initialize();
+  
   ENUM_ORDER_TYPE _signal;
   string _symbol;
   ENUM_TIMEFRAMES _period;
@@ -54,12 +55,16 @@ bool SignalBase::Update(const MqlRates& rt) {
     if (rt.tick_volume <= 1 || !_isUpdateWhenOnlyFirstTickVolume) {
       return true;
     }
+    
+    _signal = WRONG_VALUE;
   }
   return false;
 }
 
-void SignalBase::Enable() {
+bool SignalBase::Enable() {
   if (Initialize()) {
     _enabled = true;
+    return true;
   }
+  return false;
 }
