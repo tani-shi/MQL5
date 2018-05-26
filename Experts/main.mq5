@@ -1,11 +1,13 @@
 #include <Trade\Trade.mqh>
 #include <Signal\SignalManager.mqh>
+#include <Definications.mqh>
 
 SignalManager *_signal_manager;
 CTrade _trade;
 
 int OnInit() {
   _signal_manager = new SignalManager(_Symbol);
+  (*_signal_manager).Enable(SIGNAL_SAR);
   
   return INIT_SUCCEEDED;
 }
