@@ -7,50 +7,64 @@
 #property link      "https://www.mql5.com"
 
 #include <Signal\SignalBase.mqh>
-
-static const double SAR_STEP = 0.02;
-static const double SAR_MAXIMUM = 0.2;
+#include <Definications.mqh>
+#include <Utilities.mqh>
 
 class SignalSAR : SignalBase {
 public:
-  SignalSAR(int handle)
-  : SignalBase()
-  , _handle(handle)
-  , _prev_sar(-1)
-  , _prev_open(-1) {}
+  SignalSAR(const string symbol)
+  : SignalBase(symbol)
+  , _handle(INVALID_HANDLE)
+  , _prev_trend(TREND_NONE) {}
   
-  static CObject* Create(const string symbol, ENUM_TIMEFRAMES period);
-  
-  virtual bool Update(const MqlRates& rt);
+  virtual bool Initialize() override;
+  virtual bool Update(const MqlRates& rt) override;
 
 private:
-  bool SwitchedSAR(double sar, double open) const;
+  ENUM_TREND Trend(double sar, double open) const;
   
 private:
   int _handle;
-  double _prev_sar;
-  double _prev_open;
+  ENUM_TREND _prev_trend;
 };
 
-SignalSAR* SignalSAR::Create(const string symbol, ENUM_TIMEFRAMES period) {
-  int handle = iSAR(symbol, period, SAR_STEP, SAR_MAXIMUM);
-  if (handle != INVALID_HANDLE) {
-    return (new SignalSAR(handle));
-  }
-  return NULL;
-}
-
-bool SignalSAR::Update(const MqlRates& rt) {
-  if (SignalBase::Update(rt)) {
+bool SignalSAR::Initialize() {
+  _handle = iSAR(_symbol, SAR_PERIOD, SAR_STEP, SAR_MAXIMUM);
+  if (_handle != INVALID_HANDLE) {
     return true;
   }
   return false;
 }
 
-bool SignalSAR::SwitchedSAR(double sar, double open) const {
-  if ((_prev_sar > _prev_open && sar < open) ||
-      (_prev_sar < _prev_open && sar > open)) {
+bool SignalSAR::Update(const MqlRates& rt) {
+  if (SignalBase::Update(rt)) {
+    double sar = Utilities::GetBufferValueByHandle<double>(_handle, 0, 0, 1);
+    ENUM_TREND trend = Trend(sar, rt.open);
+    if (trend != TREND_NONE && _prev_trend != TREND_NONE && trend != _prev_trend) {
+      switch (trend) {
+        case TREND_UP:
+          _signal = ORDER_TYPE_BUY;
+          break;
+        case TREND_DOWN:
+          _signal = ORDER_TYPE_SELL;
+          break;
+        default:
+          _signal = WRONG_VALUE;
+          break;
+      }
+    } else {
+      _signal = WRONG_VALUE;
+    }
+    _prev_trend = trend;
     return true;
   }
-  return true;
+  return false;
+}
+
+ENUM_TREND SignalSAR::Trend(double sar, double open) const {
+  if (sar > open) {
+    return TREND_DOWN;
+  } else {
+    return TREND_UP;
+  }
 }

@@ -14,6 +14,17 @@ static const int screenHeight = 600;
 
 class Utilities {
 public:
+  template<typename T>
+  static double GetBufferValueByHandle(int handle, int buffer_num, int start_pos, int count) {
+    T buff[];
+    ArrayResize(buff, count);
+    if (CopyBuffer(handle, buffer_num, start_pos, count, buff) == 1) {
+      return buff[0];
+    }
+    Print("failed to copy buffer by handle cause no data.");
+    return 0;
+  }
+
   static void TakeScreenShotByTimeFramesList(long chartId,
                                              const ENUM_TIMEFRAMES &timeframesList[])
   {
