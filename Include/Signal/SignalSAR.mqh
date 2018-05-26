@@ -29,10 +29,13 @@ private:
 };
 
 bool SignalSAR::Initialize() {
-  _handle = iSAR(_symbol, SAR_PERIOD, SAR_STEP, SAR_MAXIMUM);
-  if (_handle != INVALID_HANDLE) {
-    return true;
+  if (SignalBase::Initialize()) {
+    _handle = iSAR(_symbol, SAR_PERIOD, SAR_STEP, SAR_MAXIMUM);
+    if (_handle != INVALID_HANDLE) {
+      return true;
+    }
   }
+
   return false;
 }
 

@@ -26,18 +26,17 @@ public:
   ENUM_ORDER_TYPE Signal() const;
 
 private:
-  SignalBase _signals[SIGNAL_MAXIMUM];
+  SignalBase* _signals[SIGNAL_MAXIMUM];
 };
 
 SignalManager::SignalManager(const string symbol) {
   for (int i = 0; i < ENUM_SIGNAL_SIZE; i++) {
-    ENUM_SIGNAL signal = i;
-    switch (signal) {
+    switch ((ENUM_SIGNAL)i) {
       case SIGNAL_SAR:
-        _signals[i] = (SignalBase)SignalSAR(symbol);
+        _signals[i] = (SignalBase*)(new SignalSAR(symbol));
         break;
       case SIGNAL_SMA:
-        _signals[i] = (SignalBase)SignalSMA(symbol);
+        _signals[i] = (SignalBase*)(new SignalSMA(symbol));
         break;
       default:
         break;
@@ -46,8 +45,8 @@ SignalManager::SignalManager(const string symbol) {
 }
 
 void SignalManager::Update(const MqlRates& rt) {
-  for (int i = 0; i < _signals.Total(); i++) {
-    (*(SignalBase*)(_signals.At(i))).Update(rt);
+  for (int i = 0; i < SIGNAL_MAXIMUM; i++) {
+    (*_signals[i]).Update(rt);
   }
 }
 
@@ -59,8 +58,8 @@ void SignalManager::Enable(ENUM_SIGNAL signal) {
 
 ENUM_ORDER_TYPE SignalManager::Signal() const {
   ENUM_ORDER_TYPE signal = _signals[0].signal();
-  for (int i = 1; i < _signals.Total(); i++) {
-    if (_signals[i].signal() != signal) {
+  for (int i = 1; i < SIGNAL_MAXIMUM; i++) {
+    if ((*_signals[i]).signal() != signal) {
       return WRONG_VALUE;
     }
   }
