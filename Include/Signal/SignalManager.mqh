@@ -20,6 +20,7 @@ enum ENUM_SIGNAL {
 class SignalManager {
 public:
   SignalManager(const string symbol);
+  virtual ~SignalManager();
 
   void Update(const MqlRates& rt);
   void Enable(ENUM_SIGNAL signal);
@@ -44,21 +45,32 @@ SignalManager::SignalManager(const string symbol) {
   }
 }
 
+SignalManager::~SignalManager() {
+  for (int i = 0; i < ENUM_SIGNAL_SIZE; i++) {
+    if (_signals[i] != NULL) {
+      delete _signals[i];
+      _signals[i] = NULL;
+    }
+  }
+}
+
 void SignalManager::Update(const MqlRates& rt) {
-  for (int i = 0; i < SIGNAL_MAXIMUM; i++) {
-    (*_signals[i]).Update(rt);
+  for (int i = 0; i < ENUM_SIGNAL_SIZE; i++) {
+    if (_signals[i] != NULL && (*_signals[i]).enabled()) {
+      (*_signals[i]).Update(rt);
+    }
   }
 }
 
 void SignalManager::Enable(ENUM_SIGNAL signal) {
-  if (!_signals[(int)signal].Initialize()) {
+  if (_signals[(int)signal] != NULL && !_signals[(int)signal].Initialize()) {
     Print("failed to initialize a signal of id=", (int)signal, ".");
   }
 }
 
 ENUM_ORDER_TYPE SignalManager::Signal() const {
   ENUM_ORDER_TYPE signal = _signals[0].signal();
-  for (int i = 1; i < SIGNAL_MAXIMUM; i++) {
+  for (int i = 1; i < ENUM_SIGNAL_SIZE; i++) {
     if ((*_signals[i]).signal() != signal) {
       return WRONG_VALUE;
     }

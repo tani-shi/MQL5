@@ -43,7 +43,10 @@ private:
 };
 
 bool SignalBase::Initialize() {
-  return true;
+  if (!_enabled) {
+    return true;
+  }
+  return false;
 }
 
 bool SignalBase::Update(const MqlRates& rt) {

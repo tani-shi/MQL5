@@ -10,6 +10,13 @@ int OnInit() {
   return INIT_SUCCEEDED;
 }
 
+void OnDeinit(const int reason) {
+  if (_signal_manager != NULL) {
+    delete _signal_manager;
+    _signal_manager = NULL;
+  }
+}
+
 void OnTick() {
   MqlRates rt[1];
   if (CopyRates(_Symbol, _Period, 0, 1, rt) != 1) {
