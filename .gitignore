@@ -1,3 +1,9 @@
 Logs/
 Files/
 Images/
+*.dat
+*.ex5
+Profiles/
+Examples/
+UnitTests/
+
