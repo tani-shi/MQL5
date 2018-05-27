@@ -16,7 +16,7 @@ public:
   
   bool IsTrading() const;
   
-private:
+protected:
   bool _is_trading;
   string _symbol;
 };
