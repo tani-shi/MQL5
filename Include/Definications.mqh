@@ -1,10 +1,7 @@
-//+------------------------------------------------------------------+
-//|                                                Definications.mqh |
-//|                                                Shintaro Tanikawa |
-//|                                             https://www.mql5.com |
-//+------------------------------------------------------------------+
+#ifndef Definications
+#define Definications
+
 #property copyright "Shintaro Tanikawa"
-#property link      "https://www.mql5.com"
 
 //------------------------
 // main
@@ -24,3 +21,24 @@
 #define SMA_MA_PERIOD 12
 #define SMA_APPLIED_PRICE PRICE_CLOSE
 
+//------------------------
+// Enum definications
+enum TREND_TYPE {
+  TREND_NONE,
+  TREND_UP,
+  TREND_DOWN,
+  TREND_MAXIMUM
+};
+
+enum WEEK {
+  WEEK_SUN,
+  WEEK_MON,
+  WEEK_TUE,
+  WEEK_WED,
+  WEEK_THU,
+  WEEK_FRI,
+  WEEK_SAT,
+  WEEK_MAXIMUM
+};
+
+#endif /* Definications */
