@@ -18,15 +18,6 @@ public:
     }
   }
   
-  bool IsSame(const string symbol, ENUM_TIMEFRAMES period) const
-  {
-    if (symbol == _symbol &&
-        period == _period) {
-      return true;
-    }
-    return false;
-  }
-  
   int handle() const { return _handle; }
 
 protected:
