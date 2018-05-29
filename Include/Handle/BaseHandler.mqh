@@ -5,16 +5,40 @@
 
 class BaseHandleWrapper {
 public:
-  int id;
-  int handle;
+  BaseHandleWrapper(const string symbol, ENUM_TIMEFRAMES period)
+  : _symbol(symbol)
+  , _handle(INVALID_HANDLE)
+  , _period(period) {}
+  
+  virtual ~BaseHandleWrapper()
+  {
+    if (_handle != INVALID_HANDLE) {
+      IndicatorRelease(_handle);
+      _handle = INVALID_HANDLE;
+    }
+  }
+  
+  bool IsSame(const string symbol, ENUM_TIMEFRAMES period) const
+  {
+    if (symbol == _symbol &&
+        period == _period) {
+      return true;
+    }
+    return false;
+  }
+  
+  int handle() const { return _handle; }
+
+protected:
+  int _handle;
+  string _symbol;
+  ENUM_TIMEFRAMES _period;
 };
 
 class BaseHandler {
 public:
   BaseHandler()
   : _handle_count(0) {}
-
-  int GetHandle(int id);
 
 protected:
   void AddHandle(BaseHandleWrapper *handle);
@@ -23,16 +47,6 @@ protected:
   BaseHandleWrapper *_handles[];
   int _handle_count;
 };
-
-int BaseHandler::GetHandle(int id)
-{
-  for (int i = 0; i < _handle_count; i++) {
-    if (_handles[0] != NULL) {
-      return (*_handles[0]).handle;
-    }
-  }
-  return WRONG_VALUE;
-}
 
 void BaseHandler::AddHandle(BaseHandleWrapper *handle)
 {
